@@ -556,8 +556,8 @@ p{color:var(--secondary)}
       <div class="filters-divider"></div>
       <div class="price-filter">
         <label for="price-range">Precio máx:</label>
-        <input type="range" id="price-range" min="50" max="300" value="300" step="10">
-        <span id="price-display">$300</span>
+        <input type="range" id="price-range" min="50000" max="300000" value="300000" step="5000">
+        <span id="price-display">$300.000</span>
       </div>
       <div class="filters-divider"></div>
       <div class="sort-filter ml-auto">
@@ -856,7 +856,7 @@ p{color:var(--secondary)}
   </div>
   <div class="cart-items" id="cart-items"></div>
   <div class="cart-footer" id="cart-footer" style="display:none">
-    <div class="cart-subtotal"><span>Subtotal</span><span id="cart-total-display">$0</span></div>
+    <div class="cart-subtotal"><span>Subtotal</span><span id="cart-total-display">$ 0</span></div>
     <div class="cart-footer-btns">
       <button class="btn btn-outline" id="cart-continue">Continuar comprando</button>
       <button class="btn btn-primary" id="cart-checkout">Ir al checkout →</button>
@@ -951,7 +951,7 @@ const PRODUCTS = [
   {
     id: 1,
     name: 'Altavoz FORMA',
-    price: 129,
+    price: 129000,
     image: 'Altavoz.png',
     category: 'home',
     isNew: true,
@@ -974,7 +974,7 @@ const PRODUCTS = [
   {
     id: 2,
     name: 'Lámpara FORMA',
-    price: 89,
+    price: 89000,
     image: 'Lampara.png',
     category: 'home',
     isNew: false,
@@ -996,7 +996,7 @@ const PRODUCTS = [
   {
     id: 3,
     name: 'Reloj FORMA',
-    price: 199,
+    price: 199000,
     image: 'reloj.png',
     category: 'accessories',
     isNew: false,
@@ -1019,7 +1019,7 @@ const PRODUCTS = [
   {
     id: 4,
     name: 'Teclado FORMA',
-    price: 159,
+    price: 159000,
     image: 'teclado.png',
     category: 'workspace',
     isNew: true,
@@ -1041,13 +1041,18 @@ const PRODUCTS = [
 ];
 </script>
 <script>
+// ===== HELPERS =====
+function formatARS(amount) {
+  return '$ ' + Math.round(amount).toLocaleString('es-AR');
+}
+
 // ===== STORE (STATE MANAGER) =====
 const Store = {
   cart: [],
   favorites: [],
   searchQuery: '',
   activeCategory: 'all',
-  filters: { priceMin: 0, priceMax: 999, sortBy: 'popular' },
+  filters: { priceMin: 0, priceMax: 999999, sortBy: 'popular' },
   activeProductId: null,
   checkoutStep: 1,
   checkoutData: { personal: {}, shipping: {}, payment: {} },
@@ -1211,7 +1216,7 @@ function renderProductCard(product) {
         <span class="rating-count">(${product.reviewCount})</span>
       </div>
       <div class="card-name">${product.name}</div>
-      <div class="card-price">$${product.price}</div>
+      <div class="card-price">${formatARS(product.price)}</div>
       <button class="card-add-btn" data-action="add-to-cart" data-id="${product.id}">Agregar al carrito</button>
     </div>`;
   return card;
@@ -1270,10 +1275,10 @@ function _doRender(grid) {
 function clearFilters() {
   Store.activeCategory = 'all';
   Store.searchQuery = '';
-  Store.filters = { priceMin: 0, priceMax: 999, sortBy: 'popular' };
+  Store.filters = { priceMin: 0, priceMax: 999999, sortBy: 'popular' };
   document.querySelectorAll('.cat-btn').forEach(b => b.classList.toggle('active', b.dataset.category === 'all'));
   const pr = document.getElementById('price-range');
-  if (pr) { pr.value = 300; document.getElementById('price-display').textContent = '$300'; }
+  if (pr) { pr.value = 300000; document.getElementById('price-display').textContent = '$300.000'; }
   const ss = document.getElementById('sort-select');
   if (ss) ss.value = 'popular';
   const si = document.getElementById('search-input');
@@ -1309,7 +1314,7 @@ function openProductDetail(productId) {
       </div>
       <div class="card-body">
         <div class="card-name">${rp.name}</div>
-        <div class="card-price">$${rp.price}</div>
+        <div class="card-price">${formatARS(rp.price)}</div>
       </div>
     </div>`).join('');
 
@@ -1325,7 +1330,7 @@ function openProductDetail(productId) {
           ${renderStars(product.rating)}
           <span class="detail-rating-text">${product.rating} · ${product.reviewCount} reseñas</span>
         </div>
-        <div class="detail-price">$${product.price}</div>
+        <div class="detail-price">${formatARS(product.price)}</div>
         <p class="detail-desc">${product.description}</p>
         <div class="detail-specs">
           <h4>Especificaciones</h4>
@@ -1439,7 +1444,7 @@ function renderCart() {
         <div class="cart-item-info">
           <div class="cart-item-name">${item.product.name}</div>
           <div class="cart-item-color">${item.selectedColor}</div>
-          <div class="cart-item-price">$${item.product.price}</div>
+          <div class="cart-item-price">${formatARS(item.product.price)}</div>
           <div class="cart-item-controls">
             <div class="qty-control">
               <button data-action="qty-dec" data-id="${item.product.id}">−</button>
@@ -1454,7 +1459,7 @@ function renderCart() {
       itemsEl.appendChild(div);
     });
     footerEl.style.display = 'flex';
-    totalEl.textContent = '$' + Store.getCartTotal().toFixed(2);
+    totalEl.textContent = formatARS(Store.getCartTotal());
   }
 }
 
@@ -1576,11 +1581,11 @@ const CHECKOUT_STEPS_HTML = [
 
 function renderCheckoutStep4() {
   const items = Store.cart.map(i =>
-    `<div class="order-item"><span>${i.product.name} × ${i.quantity}</span><span>$${(i.product.price * i.quantity).toFixed(2)}</span></div>`
+    `<div class="order-item"><span>${i.product.name} × ${i.quantity}</span><span>${formatARS(i.product.price * i.quantity)}</span></div>`
   ).join('');
   return `<h4 style="font-size:0.9rem;font-weight:700;color:var(--muted);margin-bottom:20px;letter-spacing:0.05em;text-transform:uppercase">Resumen del pedido</h4>
     ${items}
-    <div class="order-total"><span>Total</span><span>$${Store.getCartTotal().toFixed(2)}</span></div>
+    <div class="order-total"><span>Total</span><span>${formatARS(Store.getCartTotal())}</span></div>
     <p style="font-size:0.8rem;color:var(--muted);margin-top:16px;text-align:center">Al finalizar confirmas que los datos son de prueba únicamente.</p>`;
 }
 
@@ -1789,7 +1794,7 @@ function initFilters() {
   if (priceRange) {
     priceRange.addEventListener('input', debounce(() => {
       const val = parseInt(priceRange.value);
-      priceDisplay.textContent = '$' + val;
+      priceDisplay.textContent = '$ ' + parseInt(priceRange.value).toLocaleString('es-AR');
       Store.setFilters({ priceMax: val });
       renderProductsGrid(true);
     }, 200));
